@@ -1,0 +1,68 @@
+.tvnft {
+  font-family: Trebuchet MS,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif;
+  /* opacity: 0.5; */
+  font-size: 1rem;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  gap: 10px;
+  height: 100vh;
+  background-color: #000;
+}
+
+.imageContainer {
+  position: relative;
+  max-height: 100vh;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.infoContainer {
+  flex: 1;
+  background-color: #000;
+  color: #fff;
+  padding: 25px 40px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.infoLeft {
+  align-items: flex-start;
+  text-align: end;
+}
+
+.logoContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logoContainer h2 {
+  margin-bottom: 0;
+}
+
+.logoContainer img {
+  width: auto!important;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.priceHeader {
+  margin-bottom: 0;
+}
+
+.currency {
+  margin-right: 0.03rem;
+}
