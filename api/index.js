@@ -1,14 +1,33 @@
+import { getApp } from "firebase/app";
 import { getDatabase, ref, set, query, child, get, push } from "firebase/database";
+import { getStorage, ref as sRef, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getDateString } from "./utils";
 
-export async function writeListing(url, date) {
+async function uploadImage(uniqueId, fileBlob) {
+  const firebaseApp = getApp();
+  const storage = getStorage(firebaseApp);
+  const storageRef = sRef(storage, uniqueId);
+  await uploadBytes(storageRef, fileBlob);
+}
+
+// export async function writeListing(url, date) {
+//   const db = getDatabase();
+//   const dateString = getDateString(date);
+//   const listingsRef = ref(db, `listings/${dateString}`);
+//   const newListingRef = push(listingsRef);
+//   set(newListingRef, {
+//     url,
+//   });
+// }
+
+export async function writeListing(formData) {
   const db = getDatabase();
-  const dateString = getDateString(date);
+  const uniqueId = `${Date.now()}.png`;
+  await uploadImage(uniqueId, formData.image)
+  const dateString = getDateString(formData.displayDate);
   const listingsRef = ref(db, `listings/${dateString}`);
   const newListingRef = push(listingsRef);
-  set(newListingRef, {
-    url,
-  });
+  await set(newListingRef, { ...formData, imageUrl: uniqueId });
 }
 
 export async function readListings() {

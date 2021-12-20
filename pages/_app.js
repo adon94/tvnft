@@ -4,6 +4,9 @@ import { initializeApp } from "firebase/app";
 import DateAdapter from '@mui/lab/AdapterMoment';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import { Provider } from 'react-redux';
+
+import { store } from '../redux/store';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -25,14 +28,15 @@ const theme = createTheme({
   },
 });
 
-
 function MyApp({ Component, pageProps }) {
   return (
-      <LocalizationProvider dateAdapter={DateAdapter}>
-        <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </LocalizationProvider>
+      <Provider store={store}>
+        <LocalizationProvider dateAdapter={DateAdapter}>
+          <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </LocalizationProvider>
+      </Provider>
     )
 }
 

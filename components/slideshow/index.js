@@ -4,15 +4,16 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a lo
 import Carousel from "react-responsive-carousel/lib/js/components/Carousel/index";
 import Info from './Info';
 import styles from '../../styles/Slideshow.module.css'
+import { useSelector } from 'react-redux';
 
 const Preview = ({ data }) => {
-  const { imageUrl } = data
+  const { image } = data
   return (
     <div className={styles.container}>
       <Info data={data} align="left" />
       <div className={styles.imageContainer}>
         <img
-          src={imageUrl || "https://lh3.googleusercontent.com/x-8cxWfSABaoHdqyUvosBDeLr4c_6GO4YU17eHAKcF9-SwOj3FEMqQA_7mOwtg9glv7e6P8WnZuDR2_bPTiUvrai=s0"}
+          src={image || "https://lh3.googleusercontent.com/x-8cxWfSABaoHdqyUvosBDeLr4c_6GO4YU17eHAKcF9-SwOj3FEMqQA_7mOwtg9glv7e6P8WnZuDR2_bPTiUvrai=s0"}
           height="100%"
         />
         {/* <Image layout="fill" objectFit="contain" objectPosition="left top" height={size.height || 1} width={size.height || 1} loader={myLoader} src="punk" alt="punk"/> */}
@@ -22,8 +23,9 @@ const Preview = ({ data }) => {
   )
 }
 
-export default function Slideshow({ data, listings }) {
-  if (data) {
+export default function Slideshow({ listings, preview }) {
+  if (preview) {
+    const data = useSelector((state) => state.promoForm.formData)
     return <Preview data={data} />
   }
   if (listings) {

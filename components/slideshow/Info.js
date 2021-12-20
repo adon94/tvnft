@@ -5,7 +5,6 @@ import ResponsiveText from '../../components/responsiveText'
 import styles from '../../styles/Slideshow.module.css'
 
 export default function Info({ data, align }) {
-  console.log({ data })
   // const { inputRef } = useQRCode<HTMLCanvasElement>({
   //   text: 'https://github.com/bunlong/next-qrcode',
   //   options: {
@@ -43,7 +42,7 @@ export default function Info({ data, align }) {
           <img height="50px" width="auto" src="/opensea.png" />
           {/* <h2 className={styles.logo}>OpenSea</h2> */}
         </div>
-        <h3>{data.collectionName || 'CryptoPunks'}</h3>
+        <h3>{'@' + data.twitterHandle || 'CryptoPunks'}</h3>
         <h1>{data.name || (data.tokenId && `#${data.tokenId}`) || 'CryptoPunk #5217'}</h1>
       </div>
       {/* <p className={styles.priceHeader}>Price/Highest Offer:</p>

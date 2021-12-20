@@ -13,66 +13,95 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 
 import Box from '@mui/material/Box';
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
+import DatePicker from '@mui/lab/DatePicker';
 import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
 
 import styles from '../../styles/Home.module.css'
 
 import { writeListing, readListings } from '../../api'
 import Slideshow from '../../components/slideshow';
+import FileInput from '../../components/inputs/FileInput';
+
+const COLLECTION = 'COLLECTION';
+const SINGLE = 'SINGLE';
+
+const blankForm = {
+  pieceType: SINGLE,
+  name: 'Test Name',
+  description: 'Test description bla bla bla. This is a sentence.',
+  image: null,
+  marketplace: 'OpenSea',
+  url: 'opensea.io', // landing page or marketplace url
+  twitterHandle: 'mirros_nft',
+  displayDate: new Date('Tue Dec 14 2021 15:18:59 GMT+0000 (Western European Standard Time)'),
+  media: null,
+  blockchain: 'Ethereum',
+  price: '15',
+  dateAvailable: new Date('Fri Dec 24 2021 15:18:59 GMT+0000 (Western European Standard Time)'),
+  supply: 1,
+};
+// const blankForm = {
+//   pieceType: 'collection',
+//   marketplace: '',
+//   name: '',
+//   description: '',
+//   url: '', // landing page or marketplace url
+//   displayDate: [],
+//   twitterHandle: '',
+//   media: [],
+//   blockchain: '',
+//   price: '',
+//   dateAvailable: '',
+//   // collection
+//   quantity: '',
+//   // single piece
+//   editions: '',
+// };
 
 const marketplaces = ['OpenSea', 'Foundation', 'SuperRare', 'Hic et Nunc', 'KnownOrigin', 'Solanart']
 const blockchains = ['Ethereum', 'Polygon', 'Tezos', 'Solana', 'Binance', 'Cardano', 'Wax']
 export default function About() {
+  const [formData, setFormData] = useState({ ...blankForm });
+  const [imageFiles, setImageFiles] = useState([]);
+
+
   const [data, setData] = useState({})
-  const [promotionType, setPromotionType] = useState('singlePiece')
-  const [marketplace, setMarketplace] = useState('')
-  const [url, setUrl] = useState('')
-  const [date, setDate] = useState(new Date());
-  const [artist, setArtist] = useState('')
-  const [seller, setSeller] = useState('')
-  const [piece, setPiece] = useState('')
-  const [description, setDescription] = useState('')
-  const [projectStatus, setProjectStatus] = useState('')
-  const [numberOfItems, setNumberOfItems] = useState('')
-  const [blockchain, setBlockchain] = useState('Ethereum')
-  const [price, setPrice] = useState('')
-  const [email, setEmail] = useState('')
-  const [twitter, setTwitter] = useState('')
-  const [discord, setDiscord] = useState('')
-  const [website, setWebsite] = useState('')
-  const [saleStart, setSaleStart] = useState('')
-  const [saleEnd, setSaleEnd] = useState('')
-  const [reveal, setReveal] = useState('')
-  const media = 'video or image file' // max 4 images or 1 video
-  const [daysLive, setDaysLive] = []
 
   const onUrlInput = (urlValue) => {
     // eg, https://opensea.io/assets/0x60e4d786628fea6478f785a6d7e704777c86a7c6/5422
-    const options = { method: 'GET' }
-    const tokenInfos = urlValue.split('assets/')[1]
-    setUrl(urlValue)
+    setFormData({ ...formData, url: urlValue });
 
-    fetch(`https://api.opensea.io/api/v1/asset/${tokenInfos}/`, options)
-      .then(response => response.json())
-      .then((response) => {
-        console.log(response)
-        const {
-          name,
-          token_id: tokenId,
-          image_original_url: imageUrl,
-          collection: { name: collectionName },
-          // owner: { user: { username: owner }}
-        } = response
-        console.log(imageUrl)
-        setData({ name, imageUrl, collectionName, tokenId })
-      })
-      .catch(err => console.error(err));
+    if (urlValue.includes('opensea.io')) {
+      const tokenInfos = urlValue.split('assets/')[1];
+      const options = { method: 'GET' };
+      fetch(`https://api.opensea.io/api/v1/asset/${tokenInfos}/`, options)
+        .then(response => response.json())
+        .then((response) => {
+          console.log(response)
+          const {
+            name,
+            token_id: tokenId,
+            image_original_url: imageUrl,
+            collection: { name: collectionName },
+            // owner: { user: { username: owner }}
+          } = response
+          console.log(imageUrl)
+          setData({ name, imageUrl, collectionName, tokenId })
+        })
+        .catch(err => console.error(err));
+    }
   }
 
   const addListing = async () => {
-    await writeListing(url, date)
-    setUrl('')
+    // await writeListing(formData.url, formData.displayDate);
+    await writeListing(formData);
+    setFormData({ ...blankForm });
+  }
+
+  const onImage = (files) => {
+    setImageFiles(files)
+    setFormData({ ...formData, image: URL.createObjectURL(files[0]) })
   }
   
   return (
@@ -96,25 +125,84 @@ export default function About() {
           className={styles.formContainer}
         >
           <FormControl component="fieldset">
-            <FormLabel component="legend">Promotion type</FormLabel>
+            <FormLabel component="legend">Collection or Single Piece?</FormLabel>
             <RadioGroup
-              value={promotionType}
-              onChange={({ target: { value }}) => setPromotionType(value)}
+              value={formData.pieceType}
+              onChange={({ target: { value }}) => setFormData({ ...formData, pieceType: value})}
               row aria-label="promotionType"
               name="row-radio-buttons-group"
             >
-              <FormControlLabel value="singlePiece" control={<Radio />} label="Single Piece" />
-              <FormControlLabel value="collection" control={<Radio />} label="Collection" />
+              <FormControlLabel value={COLLECTION} control={<Radio />} label="Whole Collection" />
+              <FormControlLabel value={SINGLE} control={<Radio />} label="Single Piece" />
             </RadioGroup>
           </FormControl>
 
+          <TextField
+            className={styles.formItem}
+            value={formData.name}
+            onChange={({ target: { value } }) => setFormData({ ...formData, name: value})}
+            required
+            label={`Name of the ${formData.pieceType === 'collection' ? 'collection' : 'piece'}`}
+            fullWidth
+          /> 
+
+          <TextField
+            className={styles.formItem}
+            value={formData.description}
+            onChange={({ target: { value } }) => setFormData({ ...formData, description: value})}
+            required
+            label="Description"
+            multiline
+            fullWidth
+          />
+
+          {formData.image && <img src={formData.image} height={500} />}
+
+          <div className={styles.formItem}>
+            <FileInput
+              onChange={(files) => onImage(files)}
+              value={imageFiles}
+            />
+          </div>
+
+          <TextField
+            className={styles.formItem}
+            value={formData.price}
+            onChange={({ target: { value } }) => setFormData({ ...formData, price: value})}
+            required
+            type="number"
+            label={`Price${formData.pieceType === 'collection' ? ' per mint' : ''}`}
+            fullWidth
+          />
+
+          <TextField
+            className={styles.formItem}
+            value={formData.supply}
+            onChange={({ target: { value } }) => setFormData({ ...formData, supply: value})}
+            required
+            type="number"
+            label={formData.pieceType === 'collection' ? 'Supply' : 'Editions'}
+            fullWidth
+          />
+
+          <TextField
+            className={styles.formItem}
+            value={formData.blockchain}
+            onChange={({ target: { value } }) => setFormData({ ...formData, blockchain: value})}
+            required
+            label="Blockchain"
+            placeholder="Ethereum, Polygon, Tezos, Solana..."
+            fullWidth
+          />
+
           <FormControl className={styles.formItem} fullWidth>
-            <InputLabel id="marketplace-select-label">Host Marketplace</InputLabel>
+            <InputLabel id="marketplace-select-label">Marketplace</InputLabel>
             <Select
               labelId="marketplace-select-label"
               id="marketplace-select"
-              value={marketplace}
-              onChange={({ target: { value } }) => setMarketplace(value)}
+              label="Marketplace"
+              value={formData.marketplace}
+              onChange={({ target: { value } }) => setFormData({ ...formData, marketplace: value})}
             >
               {marketplaces.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
             </Select>
@@ -122,82 +210,49 @@ export default function About() {
 
           <TextField
             className={styles.formItem}
-            value={url}
+            value={formData.url}
             onChange={({ target: { value } }) => onUrlInput(value)}
             required
-            label="OpenSea Url"
+            label="Landing page or marketplace url"
             fullWidth
           />
-          <DesktopDatePicker
-            label="Promotion Date"
-            inputFormat="DD/MM/yyyy"
+
+          <DatePicker
+            label="NFT Launch date"
+            // inputFormat="DD/MM/yyyy"
             // shouldDisableDate="is"
-            value={date}
-            onChange={({ target: { value } }) => setDate(value)}
-            renderInput={(params) => <TextField {...params} />}
+            value={formData.dateAvailable}
+            onChange={(e) => {
+              console.log(e._d);
+              setFormData({ ...formData, dateAvailable: new Date(e._d) });
+            }}
+            renderInput={(params) => <TextField required className={styles.formItem} fullWidth {...params} />}
           />
-          {/* <TextField
-            className={styles.formItem}
-            value={artist}
-            onChange={({ target: { value }}) => setArtist(value)}
-            required
-            label="Artist/Studio name"
-            fullWidth
-          />
+
           <TextField
             className={styles.formItem}
-            value={piece}
-            onChange={({ target: { value }}) => setPiece(value)}
+            value={formData.twitterHandle}
+            onChange={({ target: { value } }) => setFormData({ ...formData, twitterHandle: value})}
             required
-            label="Piece name/Collection name"
+            label="Twitter handle"
             fullWidth
           />
-          <FormControl className={styles.formItem} fullWidth>
-            <InputLabel id="blockchain-select-label">Blockchain</InputLabel>
-            <Select
-              labelId="blockchain-select-label"
-              id="blockchain-select"
-              required
-              value={blockchain}
-              onChange={({ target: { value }}) => setBlockchain(value)}
-            >
-              {blockchains.map(b => <MenuItem key={b} value={b}>{b}</MenuItem>)}
-            </Select>
-          </FormControl>
-          <TextField
-            className={styles.formItem}
-            required id="filled-basic" 
-            label="Price"
-            fullWidth
-            value={price}
-            onChange={({ target: { value }}) => setPrice(value)}
+
+          <DatePicker
+            label="TVNFT Display Date"
+            // inputFormat="DD/MM/yyyy"
+            // shouldDisableDate="is"
+            value={formData.date}
+            onChange={(e) => {
+              setFormData({ ...formData, displayDate: new Date(e._d) });
+            }}
+            renderInput={(params) => <TextField required className={styles.formItem} fullWidth {...params} />}
           />
-          <TextField
-            className={styles.formItem}
-            required
-            id="outlined-basic"
-            label="Listing URL / Find out more at..."
-            fullWidth
-            value={blockchain}
-            onChange={({ target: { value }}) => setBlockchain(value)}
-          /> */}
         </Box>
 
         <Button onClick={addListing}>Add Listing</Button>
       </main>
-      <Slideshow data={data} />
-      {/* <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer> */}
+      <Slideshow data={formData} />
     </div>
   )
 }
