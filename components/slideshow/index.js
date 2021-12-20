@@ -6,8 +6,9 @@ import Info from './Info';
 import styles from '../../styles/Slideshow.module.css'
 import { useSelector } from 'react-redux';
 
-const Preview = ({ data }) => {
-  const { image } = data
+const Preview = () => {
+  const data = useSelector((state) => state.promoForm.formData);
+  const { image } = data;
   return (
     <div className={styles.container}>
       <Info data={data} align="left" />
@@ -25,8 +26,7 @@ const Preview = ({ data }) => {
 
 export default function Slideshow({ listings, preview }) {
   if (preview) {
-    const data = useSelector((state) => state.promoForm.formData)
-    return <Preview data={data} />
+    return <Preview />
   }
   if (listings) {
     let mouseTimer = null, cursorVisible = true;

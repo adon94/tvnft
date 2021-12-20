@@ -114,7 +114,7 @@ export default function About() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Promote your NFTs with <a href="/">TVNFT</a>
+          Promote your NFTs with TVNFT
         </h1>
 
         {/* <form className={styles.formContainer} noValidate autoComplete="off"> */}
