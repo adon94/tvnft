@@ -41,7 +41,7 @@ export default function Info({ data, right }) {
           {/* <div className={styles.logoContainer}>
             <img height="50px" width="auto" src="/opensea.png" />
           </div> */}
-          <Typography variant="h4">'{data.name || (data.tokenId && `#${data.tokenId}`) || 'CryptoPunk #5217'}'</Typography>
+          <Typography variant="h4">&apos;{data.name || (data.tokenId && `#${data.tokenId}`) || 'CryptoPunk #5217'}&apos;</Typography>
           {/* <Typography variant="body">{data.description}</Typography> */}
         </div>
         {/* <p className={styles.priceHeader}>Price/Highest Offer:</p>
