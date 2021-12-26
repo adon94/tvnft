@@ -36,6 +36,7 @@ export default function Home() {
         <h1 className={styles.title}>
           Promote your NFTs with <Link href="/">TVNFT</Link>
         </h1>
+        <Slideshow landing />
         <PromoForm />
         <Slideshow preview />
       </main>

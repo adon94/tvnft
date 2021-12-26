@@ -5,13 +5,15 @@ import Slideshow from '../../components/slideshow'
 import styles from '../../styles/Home.module.css'
 
 export default function Live() {
-  const [listings, setListings] = useState()
+  const [listings, setListings] = useState([])
   useEffect(() => {
     async function getListings() {
       const response = await readListings()
-      const data = await retrieveOpenSea(response)
-      console.log({ data })
-      setListings(data)
+      // const data = await retrieveOpenSea(response)
+      console.log({ response })
+      if (response) {
+        setListings(response)
+      }
     }
     getListings()
   }, [])
@@ -23,7 +25,7 @@ export default function Live() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Slideshow listings={listings} />
+        {listings.length > 0 && <Slideshow listings={listings} main />}
       </main>
     </div>
   )

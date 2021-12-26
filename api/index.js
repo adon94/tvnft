@@ -1,13 +1,22 @@
-import { getApp } from "firebase/app";
 import { getDatabase, ref, set, query, child, get, push } from "firebase/database";
-import { getStorage, ref as sRef, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as sRef, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
 import { getDateString } from "./utils";
 
-async function uploadImage(uniqueId, fileBlob) {
-  const firebaseApp = getApp();
-  const storage = getStorage(firebaseApp);
+async function uploadImage(uniqueId, fileUrl, dateString) {
+  const fileBlob = await fetch(fileUrl).then(r => r.blob());
+  const storage = getStorage();
   const storageRef = sRef(storage, uniqueId);
   await uploadBytes(storageRef, fileBlob);
+}
+
+async function downloadImage() {
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob';
+  xhr.onload = (event) => {
+    const blob = xhr.response;
+  };
+  xhr.open('GET', url);
+  xhr.send();
 }
 
 // export async function writeListing(url, date) {
@@ -21,10 +30,11 @@ async function uploadImage(uniqueId, fileBlob) {
 // }
 
 export async function writeListing(formData) {
+  console.log(formData.displayDate)
   const db = getDatabase();
   const uniqueId = `${Date.now()}.png`;
-  await uploadImage(uniqueId, formData.image)
   const dateString = getDateString(formData.displayDate);
+  await uploadImage(uniqueId, formData.image, dateString)
   const listingsRef = ref(db, `listings/${dateString}`);
   const newListingRef = push(listingsRef);
   await set(newListingRef, { ...formData, imageUrl: uniqueId });
@@ -32,16 +42,24 @@ export async function writeListing(formData) {
 
 export async function readListings() {
   const db = getDatabase();
-  const listingsRef = query(ref(db, 'listings'))
+  const dateString = getDateString(new Date());
+  // const listingsRef = query(ref(db, `listings/${dateString}`))
+  const listingsRef = query(ref(db, `listings/2021-12-24`))
+
   return await get(listingsRef).then((snapshot) => {
     if (snapshot.exists()) {
       const listings = []
       snapshot.forEach((childSnapshot) => {
-        listings.push(childSnapshot.val())
+        listings.push({ ...childSnapshot.val() })
       });
+      // for (let i = 0; i < snapshot.length; i++) {
+      //   const nftDetails = childSnapshot.val();
+      //   const image = downloadImage(nftDetails.imageUrl);
+      // }
       return listings
     } else {
       console.log("No data available");
+      return [];
     }
   }).catch((error) => {
     console.error(error);

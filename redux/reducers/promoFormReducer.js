@@ -9,11 +9,11 @@ const defaultForm = {
   marketplace: 'OpenSea',
   url: 'opensea.io', // landing page or marketplace url
   twitterHandle: 'mirros_nft',
-  displayDate: new Date('Tue Dec 14 2021 15:18:59 GMT+0000 (Western European Standard Time)'),
+  displayDate: new Date(),
   media: null,
   blockchain: 'Ethereum',
   price: '15',
-  dateAvailable: new Date('Fri Dec 24 2021 15:18:59 GMT+0000 (Western European Standard Time)'),
+  dateAvailable: new Date(),
   supply: 1,
 };
 
@@ -64,6 +64,6 @@ const promoFormReducer = createSlice({
   // },
 });
 
-export const { setFormData } = promoFormReducer.actions;
+export const { setFormData, clearForm } = promoFormReducer.actions;
 
 export default promoFormReducer.reducer;
